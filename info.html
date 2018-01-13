@@ -1,0 +1,123 @@
+<!-- Begin:_Build --><!--{_request_.b}-->
+<table class="table table-bordered table-striped">
+<tr>
+	<td colspan="2"><b>Аналитика</b><a href="index.php?db={_global_.z}&a=report&id=977" style="float:right;" class="btn btn-default">Запустить</a>
+<tr>
+	<td>Дебет:<br/><br/><div id="229"></div>
+	<td>Кредит:<br/><br/><div id="230"></div>
+</table>
+<!-- End:_Build -->
+
+<!-- Begin:_OpInfo --><!--{_request_.FR_OP_ID}-->
+<!-- Begin:intOp -->
+<table class="table table-bordered table-striped">
+<tr>
+	<td colspan="2"><h3>№{NO} от {OP_DATE}</h3><h4>Сумма: <b>{SUM}</b></h4><p>Тип операции: {OP_TYPE}</p><p>Комментарий: {COMMENT}</p>
+<tr>
+	<td><h4>Счет Дт: <b>{DT_ACC}</b></h4>{DT_NAME}
+	<td><h4>Счет Кт: <b>{CT_ACC}</b></h4>{CT_NAME}
+<tr>
+	<td colspan="2">Аналитика
+<tr>
+	<td><b>Дебет:</b><br/><div id="{DT_ID}"></div>
+	<td><b>Кредит:</b><br/><div id="{CT_ID}"></div>
+</table>
+
+<script type="text/javascript">
+var dt='{DT_ACC_ID}',ct='{CT_ACC_ID}',dt_id='{DT_ID}',ct_id='{CT_ID}';
+</script>
+<!-- End:intOp -->
+<!-- End:_OpInfo -->
+
+<script type="text/javascript">
+function getXmlHttp(){
+	var xmlhttp;
+	try {
+		xmlhttp=new ActiveXObject("Msxml2.XMLHTTP");
+	} catch (e) {
+		try {
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		} catch (E) {
+			xmlhttp=false;
+		}
+	}
+    if (!xmlhttp&&typeof XMLHttpRequest!='undefined')
+		xmlhttp=new XMLHttpRequest();
+    return xmlhttp;
+}
+function drawOptions(i){
+	var h='',cols='',count=0;
+	for(j in c)
+		count++;
+	for(j in r[i])
+		if(r[i][j].i!=238 && r[i][j].i!=239)
+			if(c[r[i][j].i]==undefined)
+				h+=count<7?'<option value="'+r[i][j].i+'">'+t[r[i][j].t].v+'</option>':'';
+			else
+				cols+='<p onmouseover="this.style=\'background-color:#eeeeee;\'" onmouseout="this.style=\'background-color:white;\'"><b>'
+					+'<a href="index.php?db={_global_.z}&a=object&id='+t[r[i][j].t].t+'" target="_blank">'+t[r[i][j].t].v+'</a></b> = '+c[r[i][j].i].v
+					+'<a style="color:red; float:right;" href="index.php?db={_global_.z}&id='+c[r[i][j].i].i+'&do=del&next_act=info%26b">удалить</a></p>';
+	document.getElementById(i).innerHTML=cols+'<form method="POST" action="index.php?db={_global_.z}&do=new_object&up=977&id=28&a=object&next_act=info%26b"'
+										+' onsubmit="if(!document.getElementById(\'v'+i+'\').value.length){alert(\'Выберите Аналитику\');event.preventDefault();}">'
+										+'<table><tr><td><select id="v'+i+'" name="val" class="form-control input-sm">'+h
+										+'</select><td><input name="t102" type="text" placeholder="Фильтр" class="form-control input-sm">'
+										+'<td><input type="submit" class="btn btn-sm btn-default" value="Добавить"></table></form>';
+}
+function getAn(i,acc,acc_rec){
+	var xmlhttp=getXmlHttp();
+	xmlhttp.open('POST', 'index.php?db={_global_.z}&a=edit_obj&id='+i,true);
+	xmlhttp.onreadystatechange = function(){
+		if(xmlhttp.readyState==4){
+			if(xmlhttp.status==200)
+				for(var j=1;j<=3;j++)
+					if(a[acc][j])
+						for(l in r[acc_rec])
+							if(t[r[acc_rec][l].t].t==a[acc][j]){
+								document.getElementById(i).innerHTML+='<br/><p>'+t[r[acc_rec][l].t].v+':<br/>'
+									+xmlhttp.responseText.match(new RegExp('(<select name\\="t'+r[acc_rec][l].i+'"[\\S\\s]*?<\/select>)', 'im'))[0]
+									+'<a id="'+i+'_'+r[acc_rec][l].i+'" style="float:right;" onclick="saveReq('+i+','+r[acc_rec][l].i+');">Сохранить</a></p>';
+								break;
+							}
+			xmlhttp.abort();
+		}
+	};
+	xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	xmlhttp.send(null);
+}
+function saveReq(up,t){
+	var xmlhttp=getXmlHttp();
+	document.getElementById(up+'_'+t).style.color='lightgray';
+	xmlhttp.open('POST', 'index.php?db={_global_.z}&do=set_attr&up='+up+'&t='+t+'&val='+$('#'+up+' select[name=t'+t+']')[0].value,true);
+	xmlhttp.onreadystatechange = function(){
+		if(xmlhttp.readyState==4){
+			if(xmlhttp.status==200)
+				document.getElementById(up+'_'+t).style.color='#337ab7';
+			xmlhttp.abort();
+		}
+	};
+	xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	xmlhttp.send(null);
+}
+
+var t=new Array(),r=new Array(),a=new Array(),c=new Array();
+<!-- Begin:&Edit_Typs -->
+if(t[{ID}]===undefined) t[{ID}]={t:{T},r:"{REF_VAL}",u:{UNIQ},v:"{VAL}"};
+if(0{ORD}){if(r[{ID}]===undefined) r[{ID}]={};r[{ID}]["{ORD}"]={ i:"{REQ_ID}",t:"{REQ_T}",a:"{ATTRS}",r:"{REFT}"};}
+<!-- End:&Edit_Typs -->
+
+<!-- Begin:_An --><!--{_request_.FR_OP_ID}-->
+<!-- Begin:intAccs -->
+a[{ACC_ID}]={1:"{A1}",2:"{A2}",3:"{A3}"};
+<!-- End:intAccs -->
+getAn(dt_id,dt,229);
+getAn(ct_id,ct,230);
+<!-- End:_An -->
+
+<!-- Begin:_B --><!--{_request_.b}-->
+<!-- Begin:intBuild -->
+c[{AN_ID}]={v:"{VAL}",i:"{ID}"};
+<!-- End:intBuild -->
+drawOptions(229);
+drawOptions(230);
+<!-- End:_B -->
+</script>
